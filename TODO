@@ -4,11 +4,17 @@
 
 --DONE-- * add functionality to server to render landing page with text.
 
-* modify landing page with following:
-  Title “Flower Catalog” at the top.
-  Image of flowers
-  Links to pages of Abeliophyllum, Ageratum and a guest book.
-  A watering Jar image.
+--DONE-- * modify landing page with following:
+            Title “Flower Catalog” at the top.
+            Image of flowers
+            Links to pages of Abeliophyllum, Ageratum and a guest book.
+            A watering Jar image.
+
+* modify server: server should be able to load every image and data on landing page.
+
+
+* add styling to the landing page.
+
 
 * A watering Jar should disappear on click for a second.
 

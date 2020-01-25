@@ -38,7 +38,6 @@ const main = function(port) {
     });
     socket.on("data", data => {
       const pageResponse = generatePageResponse(data);
-      console.warn(pageResponse);
       socket.write(pageResponse.response);
       socket.write(pageResponse.data);
     });
