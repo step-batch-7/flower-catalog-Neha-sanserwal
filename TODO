@@ -1,3 +1,14 @@
---DONE-- *create a static landing page with text flower catalog
---DONE-- *create server rendering 404 status.
-*add functionality to server to render landing page with text.
+--DONE-- * create a static landing page with text flower catalog.
+
+--DONE-- * create server rendering 404 status.
+
+--DONE-- * add functionality to server to render landing page with text.
+
+* modify landing page with following:
+  Title “Flower Catalog” at the top.
+  Image of flowers
+  Links to pages of Abeliophyllum, Ageratum and a guest book.
+  A watering Jar image.
+
+* A watering Jar should disappear on click for a second.
+

@@ -1,5 +1,19 @@
 const { Server } = require("net");
-const generatePageResponse = function() {
+const fs = require("fs");
+const generatePageResponse = function(data) {
+  const [request] = data.split("\n");
+  const [method, url] = request.split(" ");
+  if (method === "GET" && url === "/") {
+    const data = fs.readFileSync("index.html");
+    const response = [
+      "http/1.1 200 OK",
+      "content-type : text/html",
+      `content-length: ${data.length}`,
+      "",
+      ""
+    ];
+    return { response: response.join("\n"), data };
+  }
   const response = [
     "http/1.1 404 NOT FOUND",
     "content-type : text/html",
@@ -7,7 +21,7 @@ const generatePageResponse = function() {
     "",
     ""
   ];
-  return response.join("\n");
+  return { response: response.join("\n"), data };
 };
 
 const main = function(port) {
@@ -23,7 +37,10 @@ const main = function(port) {
       console.warn(`closing ${socket.remotePort}`);
     });
     socket.on("data", data => {
-      socket.write(generatePageResponse());
+      const pageResponse = generatePageResponse(data);
+      console.warn(pageResponse);
+      socket.write(pageResponse.response);
+      socket.write(pageResponse.data);
     });
   });
   server.listen(port);
