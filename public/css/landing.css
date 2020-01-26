@@ -1,0 +1,31 @@
+.heading {
+  border-bottom: 1px solid lightgray;
+  margin-bottom: 1%;
+  text-align: right;
+  font-family: serif;
+  color: orange;
+}
+.heading > h1 {
+  margin-right: 21%;
+}
+.container {
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+}
+.container > .header-image {
+  border: 1px solid black;
+}
+.links {
+  display: flex;
+  flex-flow: column;
+  flex-wrap: wrap;
+  margin-left: 1%;
+  justify-content: space-evenly;
+}
+.page-links {
+  margin: 0 auto;
+  margin-bottom: 8%;
+}

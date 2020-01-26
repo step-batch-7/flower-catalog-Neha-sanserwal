@@ -8,7 +8,7 @@ const loadResponseText = function(url) {
   const data = fs.readFileSync(url);
   const response = [
     "http/1.1 200 OK",
-    `content-type: ${fileExt}`,
+    `content-type: text/${fileExt}`,
     `content-length: ${data.length}`,
     "",
     ""
