@@ -6,6 +6,15 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>flower catalog</title>
     <link rel="stylesheet" href="css/landing.css" />
+    <script>
+      const hideJar = function() {
+        const jar = document.getElementById("waterJar");
+        jar.style.visibility = "hidden";
+        setTimeout(() => {
+          jar.removeAttribute("style");
+        }, 1 * 1000);
+      };
+    </script>
   </head>
   <body>
     <div class="heading">
@@ -23,6 +32,8 @@
         <div>
           <a href="#">Guest Book</a>
           <img
+            id="waterJar"
+            onclick="hideJar()"
             src="./images/animated-flower-image-0021.gif "
             alt="animated-watering-pot"
           />
