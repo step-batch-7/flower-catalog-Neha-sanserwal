@@ -12,34 +12,42 @@ const DEFAULT_HEADERS = {
   "Content-Type": "text/html",
   "Content-Length": "0"
 };
-const loadComments = function(params) {
+const loadComments = function() {
   let comments = fs.readFileSync("comments.json", "utf8");
   return JSON.parse(comments);
 };
+
 const saveComments = function(newRequest) {
   newRequest.changeBody();
   let comments = loadComments();
   comments.push(newRequest.body);
   fs.writeFileSync("./comments.json", JSON.stringify(comments));
 };
+const readCommentList = function(comment) {
+  let commentTemplate = fs.readFileSync("./commentTemplate.html", "utf8");
+  for (let key in comment) {
+    commentTemplate = commentTemplate.replace(`__${key}__`, comment[key]);
+  }
+  return commentTemplate;
+};
+
+const serveGuestPage = function(newRequest, newResponse) {
+  let guestPage = fs.readFileSync(newRequest.completeUrl, "utf8");
+  let comments = loadComments();
+  let commentsList = comments.map(readCommentList);
+  guestPage = guestPage.replace("__COMMENTS__", commentsList.join("\n"));
+  return newResponse.generateGetResponse(newRequest.completeUrl, guestPage);
+};
 
 const loadResponseText = function(newRequest, newResponse) {
+  console.log(newRequest.method);
   if (!fs.existsSync(newRequest.completeUrl)) {
     return newResponse.data;
   }
   if (newRequest.hasMethodPost()) {
+    console.log("came here");
     saveComments(newRequest);
-    let guestPage = fs.readFileSync("./public/guestBook.html", "utf8");
-    let comments = loadComments();
-    let commentsList = comments.map(comment => {
-      let commentTemplate = fs.readFileSync("./commentTemplate.html", "utf8");
-      for (let key in comment) {
-        commentTemplate = commentTemplate.replace(`__${key}__`, comment[key]);
-      }
-      return commentTemplate;
-    });
-    guestPage = guestPage.replace("__COMMENTS__", commentsList.join("\n"));
-    return newResponse.generateGetResponse(newRequest.completeUrl, guestPage);
+    return serveGuestPage(newResponse, newRequest);
   }
   let newBody = fs.readFileSync(newRequest.completeUrl);
   return newResponse.generateGetResponse(newRequest.completeUrl, newBody);
@@ -70,6 +78,10 @@ const generateRequestData = function(data) {
 const generatePageResponse = function(data) {
   const newRequest = generateRequestData(data);
   const newResponse = new Response(DEFAULT_RESPONSE, DEFAULT_HEADERS, "");
+  let url = newRequest.completeUrl;
+  if (newRequest.hasMethodGet && url.includes("/public/guestBook.html")) {
+    return serveGuestPage(newRequest, newResponse);
+  }
   return loadResponseText(newRequest, newResponse);
 };
 
@@ -87,7 +99,6 @@ const main = function(port) {
     });
     socket.on("data", data => {
       const pageResponse = generatePageResponse(data);
-      console.warn(data);
       socket.write(pageResponse.head);
       socket.write(pageResponse.body);
     });
@@ -95,4 +106,4 @@ const main = function(port) {
   server.listen(port);
 };
 
-main(process.argv[2] || 8000);
+main(8000);

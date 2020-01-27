@@ -1,0 +1,22 @@
+.comments {
+  margin-top: 5%;
+  display: flex;
+  flex-flow: column;
+  flex-wrap: wrap;
+  width: 60%;
+}
+.comment-desc {
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+  text-align: left;
+  flex-wrap: wrap;
+  width: 100%;
+  border: 1px solid lightgray;
+  margin: 0 auto;
+}
+.comment-desc > div {
+  width: 20%;
+  text-align: left;
+  border-right: 1px solid lightslategray;
+}
