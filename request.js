@@ -13,15 +13,31 @@ class Request {
     const body = this.body;
     return { head, body };
   }
-  hasMethodPost() {
-    return this.method === "POST";
-  }
+
   get completeUrl() {
     let completeUrl = `${STATIC_DIR}${this.url}`;
     if (this.url === "/") {
       completeUrl = `${STATIC_DIR}/index.html`;
     }
     return completeUrl;
+  }
+
+  hasMethodPost() {
+    return this.method === "POST";
+  }
+
+  hasMethodGet() {
+    return this.method === "GET";
+  }
+
+  changeBody() {
+    const resultedBody = {};
+    const formDetails = this.body.split("&");
+    for (let detail of formDetails) {
+      let [key, value] = detail.split("=");
+      resultedBody[key] = value;
+    }
+    this.body = resultedBody;
   }
 }
 

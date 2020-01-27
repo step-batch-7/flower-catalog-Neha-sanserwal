@@ -7,25 +7,31 @@ const DEFAULT_RESPONSE = {
   status: "404",
   statusMsg: "NOT FOUND"
 };
+
 const DEFAULT_HEADERS = {
   "Content-Type": "text/html",
   "Content-Length": "0"
 };
-const loadResponseText = function(method, url, newResponse) {
-  if (!fs.existsSync(url)) {
+
+const loadResponseText = function(newRequest, newResponse) {
+  if (!fs.existsSync(newRequest.completeUrl)) {
     return newResponse.data;
   }
-  const [, fileExt] = url.split(".");
+  if (newRequest.hasMethodPost()) {
+    newRequest.changeBody();
+    let comments = fs.readFileSync("comments.json", "utf8");
+    comments = JSON.parse(comments);
+    comments.push(newRequest.body);
+    fs.writeFileSync("./comments.json", JSON.stringify(comments));
+  }
+  const [, fileExt] = newRequest.completeUrl.split(".");
   const res = { status: "200", statusMsg: "OK" };
   newResponse.changeResponse(res);
-  let body = "";
-  if (method == "GET") {
-    body = fs.readFileSync(url);
-    newResponse.changeBody(body);
-  }
+  const newBody = fs.readFileSync(newRequest.completeUrl);
+  newResponse.changeBody(newBody);
   const headers = [
     `Content-Type: text/${fileExt}`,
-    `Content-Length: ${body.length}`
+    `Content-Length: ${newBody.length}`
   ];
   newResponse.changeHeaders(headers);
   return newResponse.data;
@@ -50,15 +56,13 @@ const generateRequestData = function(data) {
   const headAndBody = headersAndBody.reduce(getHeadAndBody, { headers: [] });
   const req = { method, url, protocol };
   const newRequest = new Request(req, headAndBody);
-
   return newRequest;
 };
 
 const generatePageResponse = function(data) {
   const newRequest = generateRequestData(data);
-  const completeUrl = newRequest.completeUrl;
   const newResponse = new Response(DEFAULT_RESPONSE, DEFAULT_HEADERS, "");
-  return loadResponseText(newRequest.method, completeUrl, newResponse);
+  return loadResponseText(newRequest, newResponse);
 };
 
 const main = function(port) {
@@ -75,12 +79,13 @@ const main = function(port) {
     });
     socket.on("data", data => {
       const pageResponse = generatePageResponse(data);
+      console.warn(data);
       socket.write(pageResponse.head);
-      socket.write("");
       socket.write(pageResponse.body);
+      console.warn(pageResponse.head, pageResponse.body);
     });
   });
   server.listen(port);
 };
 
-main(process.argv[2]);
+main(process.argv[2] || 8000);

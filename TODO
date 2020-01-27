@@ -32,5 +32,7 @@
 
 
 --DONE-- * A watering Jar should disappear on click for a second.
---DONE-- * extract class request and response
 
+--DONE-- * extract class request and response.
+
+--DONE-- * if the request has post method save data to json File.

@@ -1,3 +1,4 @@
+const fs = require("fs");
 class Response {
   constructor(res, headers, body) {
     this.status = res.status;
@@ -9,14 +10,14 @@ class Response {
   stringifyHeaders() {
     let stringifiedHeaders = "";
     for (let key in this.headers) {
-      stringifiedHeaders = `${stringifiedHeaders}${key} : ${this.headers[key]}\n`;
+      stringifiedHeaders = `${stringifiedHeaders}${key} : ${this.headers[key]}\r\n`;
     }
     return stringifiedHeaders;
   }
 
   get data() {
     const msg = `${this.protocol} ${this.status} ${this.statusMsg}`;
-    const head = `${msg}\n${this.stringifyHeaders()}\n`;
+    const head = `${msg}\r\n${this.stringifyHeaders()}\r\n`;
     const body = this.body;
     return { head, body };
   }
@@ -32,8 +33,8 @@ class Response {
       this.headers[key] = value;
     }
   }
-  changeBody(body) {
-    this.body = body;
+  changeBody(newBody) {
+    this.body = newBody;
   }
 }
 module.exports = { Response };
