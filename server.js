@@ -13,18 +13,22 @@ const DEFAULT_HEADERS = {
   "Content-Length": "0"
 };
 const loadComments = function() {
-  let comments = fs.readFileSync("comments.json", "utf8");
+  if (!fs.existsSync("./comments.json")) {
+    fs.writeFileSync("./comments.json", JSON.stringify([]));
+  }
+  let comments = fs.readFileSync("./comments.json", "utf8");
   return JSON.parse(comments);
 };
 
 const saveComments = function(newRequest) {
   newRequest.changeBody();
   let comments = loadComments();
-  comments.push(newRequest.body);
+  comments.unshift(newRequest.body);
   fs.writeFileSync("./comments.json", JSON.stringify(comments));
 };
 const readCommentList = function(comment) {
   let commentTemplate = fs.readFileSync("./commentTemplate.html", "utf8");
+
   for (let key in comment) {
     commentTemplate = commentTemplate.replace(`__${key}__`, comment[key]);
   }
@@ -40,14 +44,12 @@ const serveGuestPage = function(newRequest, newResponse) {
 };
 
 const loadResponseText = function(newRequest, newResponse) {
-  console.log(newRequest.method);
   if (!fs.existsSync(newRequest.completeUrl)) {
     return newResponse.data;
   }
   if (newRequest.hasMethodPost()) {
-    console.log("came here");
     saveComments(newRequest);
-    return serveGuestPage(newResponse, newRequest);
+    return serveGuestPage(newRequest, newResponse);
   }
   let newBody = fs.readFileSync(newRequest.completeUrl);
   return newResponse.generateGetResponse(newRequest.completeUrl, newBody);
@@ -79,7 +81,7 @@ const generatePageResponse = function(data) {
   const newRequest = generateRequestData(data);
   const newResponse = new Response(DEFAULT_RESPONSE, DEFAULT_HEADERS, "");
   let url = newRequest.completeUrl;
-  if (newRequest.hasMethodGet && url.includes("/public/guestBook.html")) {
+  if (newRequest.hasMethodGet() && url.includes("/public/guestBook.html")) {
     return serveGuestPage(newRequest, newResponse);
   }
   return loadResponseText(newRequest, newResponse);

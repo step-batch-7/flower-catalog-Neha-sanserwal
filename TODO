@@ -40,4 +40,6 @@
 --DONE-- * extract generateGETResponse from server.js and save comments.
           --bug = same data repeatedly saved on the json when form is resubmitted
 
-* create a template and render to guest page.
+--Done-- * create a template and render to guest page.
+          -resolved- *bug = cannot render the new comment
+--Done-- * add css to comment section.
