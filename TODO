@@ -41,5 +41,10 @@
           --bug = same data repeatedly saved on the json when form is resubmitted
 
 --Done-- * create a template and render to guest page.
-          -resolved- *bug = cannot render the new comment
+          -resolved- *bug = cannot render the new comment.
+
 --Done-- * add css to comment section.
+
+--DONE* add css to guest Page.
+
+--Done-- * added feature of creating json if it is not present.

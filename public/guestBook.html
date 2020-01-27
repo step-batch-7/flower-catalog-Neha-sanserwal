@@ -7,10 +7,13 @@
     <link rel="stylesheet" href="./css/guestBook.css">
   </head>
   <body>
+    <div class = 'heading'>
     <h1><a href="/"> << </a> Guest Book</h1>
-    <div class = 'guestHead'><h1>Leave a comment</h1>
+    </div>
+    <div class = 'guestHead'><h2>Leave a comment</h2>
     <form action="guestBook.html" method="POST">
       Name: <input type="text" name="username" placeholder="John" required />
+      <br/>
       Comment:
       <textarea
         height="400"
@@ -18,7 +21,8 @@
         required
         placeholder="this is a comment"
       ></textarea>
-      <input type="submit" />
+      <br/>
+      <button type="submit"> Submit</button>
     </form>
     <div class="comments">
       <div class="comment-desc">
