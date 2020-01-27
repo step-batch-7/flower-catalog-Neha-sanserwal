@@ -38,3 +38,6 @@
 --DONE-- * if the request has post method save data to json File.
 
 --DONE-- * extract generateGETResponse from server.js and save comments.
+          --bug = same data repeatedly saved on the json when form is resubmitted
+
+* create a template and render to guest page.

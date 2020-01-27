@@ -37,12 +37,11 @@ class Response {
     this.body = newBody;
   }
 
-  generateGetResponse(url) {
+  generateGetResponse(url, body) {
     const [, fileExt] = url.split(".");
     const res = { status: "200", statusMsg: "OK" };
     this.changeResponse(res);
-    const newBody = fs.readFileSync(url);
-    this.changeBody(newBody);
+    this.changeBody(body);
     const headers = [
       `Content-Type: text/${fileExt}`,
       `Content-Length: ${this.body.length}`

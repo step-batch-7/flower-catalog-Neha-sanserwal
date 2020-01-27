@@ -7,13 +7,18 @@
   </head>
   <body>
     <h1><a href="/"> << </a> Guest Book</h1>
-    <hr />
-    <h1>Leave a comment</h1>
+    <div class = 'guestHead'><h1>Leave a comment</h1>
     <form action="guestBook.html" method="POST">
-      Name: <input type="text" name="username" required />
+      Name: <input type="text" name="username" placeholder="John" required />
       Comment:
-      <textarea name="comment" required></textarea>
+      <textarea
+        height="400"
+        name="comment"
+        required
+        placeholder="this is a comment"
+      ></textarea>
       <input type="submit" />
     </form>
+    <div id="comments">__COMMENTS__</div>
   </body>
 </html>

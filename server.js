@@ -12,10 +12,13 @@ const DEFAULT_HEADERS = {
   "Content-Type": "text/html",
   "Content-Length": "0"
 };
+const loadComments = function(params) {
+  let comments = fs.readFileSync("comments.json", "utf8");
+  return JSON.parse(comments);
+};
 const saveComments = function(newRequest) {
   newRequest.changeBody();
-  let comments = fs.readFileSync("comments.json", "utf8");
-  comments = JSON.parse(comments);
+  let comments = loadComments();
   comments.push(newRequest.body);
   fs.writeFileSync("./comments.json", JSON.stringify(comments));
 };
@@ -26,8 +29,20 @@ const loadResponseText = function(newRequest, newResponse) {
   }
   if (newRequest.hasMethodPost()) {
     saveComments(newRequest);
+    let guestPage = fs.readFileSync("./public/guestBook.html", "utf8");
+    let comments = loadComments();
+    let commentsList = comments.map(comment => {
+      let commentTemplate = fs.readFileSync("./commentTemplate.html", "utf8");
+      for (let key in comment) {
+        commentTemplate = commentTemplate.replace(`__${key}__`, comment[key]);
+      }
+      return commentTemplate;
+    });
+    guestPage = guestPage.replace("__COMMENTS__", commentsList.join("\n"));
+    return newResponse.generateGetResponse(newRequest.completeUrl, guestPage);
   }
-  return newResponse.generateGetResponse(newRequest.completeUrl);
+  let newBody = fs.readFileSync(newRequest.completeUrl);
+  return newResponse.generateGetResponse(newRequest.completeUrl, newBody);
 };
 
 const getHeadAndBody = function(headAndBody, line) {
