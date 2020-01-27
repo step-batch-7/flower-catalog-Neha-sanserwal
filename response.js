@@ -36,5 +36,19 @@ class Response {
   changeBody(newBody) {
     this.body = newBody;
   }
+
+  generateGetResponse(url) {
+    const [, fileExt] = url.split(".");
+    const res = { status: "200", statusMsg: "OK" };
+    this.changeResponse(res);
+    const newBody = fs.readFileSync(url);
+    this.changeBody(newBody);
+    const headers = [
+      `Content-Type: text/${fileExt}`,
+      `Content-Length: ${this.body.length}`
+    ];
+    this.changeHeaders(headers);
+    return this.data;
+  }
 }
 module.exports = { Response };

@@ -37,6 +37,8 @@ class Request {
       let [key, value] = detail.split("=");
       resultedBody[key] = value;
     }
+    resultedBody.date = new Date().toLocaleDateString();
+    resultedBody.time = new Date().toLocaleTimeString();
     this.body = resultedBody;
   }
 }

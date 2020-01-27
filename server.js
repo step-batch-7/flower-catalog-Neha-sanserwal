@@ -12,29 +12,22 @@ const DEFAULT_HEADERS = {
   "Content-Type": "text/html",
   "Content-Length": "0"
 };
+const saveComments = function(newRequest) {
+  newRequest.changeBody();
+  let comments = fs.readFileSync("comments.json", "utf8");
+  comments = JSON.parse(comments);
+  comments.push(newRequest.body);
+  fs.writeFileSync("./comments.json", JSON.stringify(comments));
+};
 
 const loadResponseText = function(newRequest, newResponse) {
   if (!fs.existsSync(newRequest.completeUrl)) {
     return newResponse.data;
   }
   if (newRequest.hasMethodPost()) {
-    newRequest.changeBody();
-    let comments = fs.readFileSync("comments.json", "utf8");
-    comments = JSON.parse(comments);
-    comments.push(newRequest.body);
-    fs.writeFileSync("./comments.json", JSON.stringify(comments));
+    saveComments(newRequest);
   }
-  const [, fileExt] = newRequest.completeUrl.split(".");
-  const res = { status: "200", statusMsg: "OK" };
-  newResponse.changeResponse(res);
-  const newBody = fs.readFileSync(newRequest.completeUrl);
-  newResponse.changeBody(newBody);
-  const headers = [
-    `Content-Type: text/${fileExt}`,
-    `Content-Length: ${newBody.length}`
-  ];
-  newResponse.changeHeaders(headers);
-  return newResponse.data;
+  return newResponse.generateGetResponse(newRequest.completeUrl);
 };
 
 const getHeadAndBody = function(headAndBody, line) {
@@ -75,14 +68,13 @@ const main = function(port) {
       console.warn(`closing ${socket.remotePort}`);
     });
     socket.on("end", () => {
-      console.warn(`closing ${socket.remotePort}`);
+      console.warn(`ending ${socket.remotePort}`);
     });
     socket.on("data", data => {
       const pageResponse = generatePageResponse(data);
       console.warn(data);
       socket.write(pageResponse.head);
       socket.write(pageResponse.body);
-      console.warn(pageResponse.head, pageResponse.body);
     });
   });
   server.listen(port);

@@ -36,3 +36,5 @@
 --DONE-- * extract class request and response.
 
 --DONE-- * if the request has post method save data to json File.
+
+--DONE-- * extract generateGETResponse from server.js and save comments.
