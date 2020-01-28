@@ -61,6 +61,8 @@ const getHeadAndBody = function(headAndBody, line) {
     return headAndBody;
   }
   if ("body" in headAndBody) {
+    line = line.replace(/\+/g, " ");
+    line = decodeURIComponent(line);
     headAndBody.body += line;
     return headAndBody;
   }
