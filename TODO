@@ -49,3 +49,4 @@
 
 --Done-- * added feature of creating json if it is not present.
 --DONE-- * removed encoded character.
+--Done-- * use http request. 
