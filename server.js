@@ -1,36 +1,32 @@
 const http = require("http");
 const fs = require("fs");
-const url = require("url");
+const { Comment } = require("./comments");
 const STATIC_DIR = `${__dirname}/public`;
+const COMMENTS_FILE = "./comments.json";
 
 const getFileExtension = function(fileName) {
   const [, fileExt] = fileName.split(".");
   return fileExt;
 };
-const loadOlderComments = function() {
-  if (!fs.existsSync("./comments.json")) {
-    fs.writeFileSync("./comments.json", JSON.stringify([]));
+
+const loadOlderComments = function(commentsFile) {
+  if (!fs.existsSync(commentsFile)) {
+    fs.writeFileSync(commentsFile, JSON.stringify([]));
   }
-  let comments = fs.readFileSync("./comments.json", "utf8");
+  let comments = fs.readFileSync(commentsFile, "utf8");
   return JSON.parse(comments);
 };
-const parseCommentsDetails = function(comment) {
-  const resultedBody = url.parse(`?${comment}`, true).query;
-  resultedBody.date = new Date().toLocaleDateString();
-  resultedBody.time = new Date().toLocaleTimeString();
-  return resultedBody;
-};
+
 const saveComments = function(newRequest, newResponse) {
-  let comment = "";
+  let newComment = new Comment(COMMENTS_FILE);
   newRequest.on("data", chunk => {
-    comment += chunk;
+    newComment.commentLog = chunk;
   });
 
   newRequest.on("end", () => {
-    let parsedComment = parseCommentsDetails(comment);
-    let comments = loadOlderComments();
-    comments.unshift(parsedComment);
-    fs.writeFileSync("./comments.json", JSON.stringify(comments));
+    newComment.commentsData = loadOlderComments(COMMENTS_FILE);
+    newComment.parseCommentDetails();
+    newComment.saveComment();
     serveGuestPage(newRequest, newResponse);
   });
 };
@@ -51,21 +47,6 @@ const getCompleteUrl = function(url) {
   }
   return completeUrl;
 };
-
-const loadResponseText = function(newRequest, newResponse) {
-  let completeUrl = getCompleteUrl(newRequest.url);
-  console.log(completeUrl);
-  if (!fs.existsSync(completeUrl)) {
-    newResponse.writeHead("404", "NOT FOUND");
-    newResponse.end();
-  }
-  if (newRequest.method === "POST") {
-    return saveComments(newRequest, newResponse);
-  }
-  let newBody = fs.readFileSync(completeUrl);
-  generateGetResponse(completeUrl, newResponse, newBody);
-};
-
 const generateGetResponse = function(url, newResponse, body) {
   const fileExt = getFileExtension(url);
   const statusLine = { statusCode: "200", statusMsg: "OK" };
@@ -75,10 +56,23 @@ const generateGetResponse = function(url, newResponse, body) {
   newResponse.end();
 };
 
+const loadResponseText = function(newRequest, newResponse) {
+  let completeUrl = getCompleteUrl(newRequest.url);
+  if (!fs.existsSync(completeUrl)) {
+    newResponse.writeHead("404", "NOT FOUND");
+    newResponse.end();
+  }
+  if (newRequest.method === "POST") {
+    return saveComments(newRequest, newResponse);
+  }
+  let body = fs.readFileSync(completeUrl);
+  generateGetResponse(completeUrl, newResponse, body);
+};
+
 const serveGuestPage = function(newRequest, newResponse) {
   let completeUrl = getCompleteUrl(newRequest.url);
   let guestPage = fs.readFileSync(completeUrl, "utf8");
-  let comments = loadOlderComments();
+  comments = loadOlderComments(COMMENTS_FILE);
   let commentsList = comments.map(readCommentList);
   guestPage = guestPage.replace("__COMMENTS__", commentsList.join("\n"));
   generateGetResponse(completeUrl, newResponse, guestPage);
