@@ -51,4 +51,8 @@
 --DONE-- * removed encoded character.
 --Done-- * use http request. 
 --Done-- * extract class comments
-          add save comment method and setters of commentLog and logs
+          add save comment method and setters of commentLog and logs.
+
+--Done-- * Extract loadFile  and write to function.
+
+--Done-- * move file to respective folder

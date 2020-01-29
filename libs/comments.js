@@ -14,7 +14,7 @@ class Comment {
   set commentsData(data) {
     this.commentLogs = [...data];
   }
-  saveComment() {
+  append() {
     this.commentLogs.unshift(this.commentDetails);
     fs.writeFileSync(this.commentsFile, JSON.stringify(this.commentLogs));
   }

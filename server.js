@@ -1,19 +1,26 @@
 const http = require("http");
 const fs = require("fs");
-const { Comment } = require("./comments");
+const { Comment } = require("./libs/comments");
 const STATIC_DIR = `${__dirname}/public`;
-const COMMENTS_FILE = "./comments.json";
+const COMMENTS_FILE = `${STATIC_DIR}/docs/comments.json`;
 
 const getFileExtension = function(fileName) {
   const [, fileExt] = fileName.split(".");
   return fileExt;
 };
+const loadFile = function(filePath) {
+  return fs.readFileSync(filePath, "utf8");
+};
+
+const writeTo = function(filePath, data) {
+  fs.writeFileSync(filePath, JSON.stringify(data));
+};
 
 const loadOlderComments = function(commentsFile) {
   if (!fs.existsSync(commentsFile)) {
-    fs.writeFileSync(commentsFile, JSON.stringify([]));
+    writeTo(commentsFile, []);
   }
-  let comments = fs.readFileSync(commentsFile, "utf8");
+  let comments = loadFile(commentsFile);
   return JSON.parse(comments);
 };
 
@@ -24,16 +31,16 @@ const saveComments = function(newRequest, newResponse) {
   });
 
   newRequest.on("end", () => {
+    postComment();
     newComment.commentsData = loadOlderComments(COMMENTS_FILE);
     newComment.parseCommentDetails();
-    newComment.saveComment();
+    newComment.append();
     serveGuestPage(newRequest, newResponse);
   });
 };
 
 const readCommentList = function(comment) {
-  let commentTemplate = fs.readFileSync("./commentTemplate.html", "utf8");
-
+  let commentTemplate = loadFile("templates/commentTemplate.html");
   for (let key in comment) {
     commentTemplate = commentTemplate.replace(`__${key}__`, comment[key]);
   }
@@ -41,23 +48,22 @@ const readCommentList = function(comment) {
 };
 
 const getCompleteUrl = function(url) {
-  let completeUrl = `${STATIC_DIR}${url}`;
   if (url === "/") {
-    completeUrl = `${STATIC_DIR}/index.html`;
+    return `${STATIC_DIR}/index.html`;
   }
-  return completeUrl;
+  return `${STATIC_DIR}${url}`;
 };
+
 const generateGetResponse = function(url, newResponse, body) {
   const fileExt = getFileExtension(url);
-  const statusLine = { statusCode: "200", statusMsg: "OK" };
   newResponse.setHeader("Content-Type", `text/${fileExt}`);
-  newResponse.writeHead(statusLine.statusCode, statusLine.statusMsg);
+  newResponse.writeHead("200", "OK");
   newResponse.write(body);
   newResponse.end();
 };
 
 const loadResponseText = function(newRequest, newResponse) {
-  let completeUrl = getCompleteUrl(newRequest.url);
+  let completeUrl = getCompleteUrl(newRequest.url, "public");
   if (!fs.existsSync(completeUrl)) {
     newResponse.writeHead("404", "NOT FOUND");
     newResponse.end();
@@ -70,9 +76,9 @@ const loadResponseText = function(newRequest, newResponse) {
 };
 
 const serveGuestPage = function(newRequest, newResponse) {
-  let completeUrl = getCompleteUrl(newRequest.url);
-  let guestPage = fs.readFileSync(completeUrl, "utf8");
-  comments = loadOlderComments(COMMENTS_FILE);
+  const completeUrl = getCompleteUrl(newRequest.url, "templates");
+  let guestPage = loadFile(completeUrl);
+  let comments = loadOlderComments(COMMENTS_FILE);
   let commentsList = comments.map(readCommentList);
   guestPage = guestPage.replace("__COMMENTS__", commentsList.join("\n"));
   generateGetResponse(completeUrl, newResponse, guestPage);
