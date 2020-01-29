@@ -8,8 +8,11 @@ const getFileExtension = function(fileName) {
   const [, fileExt] = fileName.split(".");
   return fileExt;
 };
-const loadFile = function(filePath) {
-  return fs.readFileSync(filePath, "utf8");
+const loadFile = function(filePath, encoding) {
+  if (encoding) {
+    return fs.readFileSync(filePath, encoding);
+  }
+  return fs.readFileSync(filePath);
 };
 
 const writeTo = function(filePath, data) {
@@ -31,7 +34,6 @@ const saveComments = function(newRequest, newResponse) {
   });
 
   newRequest.on("end", () => {
-    postComment();
     newComment.commentsData = loadOlderComments(COMMENTS_FILE);
     newComment.parseCommentDetails();
     newComment.append();
@@ -40,7 +42,7 @@ const saveComments = function(newRequest, newResponse) {
 };
 
 const readCommentList = function(comment) {
-  let commentTemplate = loadFile("templates/commentTemplate.html");
+  let commentTemplate = loadFile("templates/commentTemplate.html", "utf8");
   for (let key in comment) {
     commentTemplate = commentTemplate.replace(`__${key}__`, comment[key]);
   }
@@ -68,16 +70,13 @@ const loadResponseText = function(newRequest, newResponse) {
     newResponse.writeHead("404", "NOT FOUND");
     newResponse.end();
   }
-  if (newRequest.method === "POST") {
-    return saveComments(newRequest, newResponse);
-  }
-  let body = fs.readFileSync(completeUrl);
+  let body = loadFile(completeUrl);
   generateGetResponse(completeUrl, newResponse, body);
 };
 
 const serveGuestPage = function(newRequest, newResponse) {
   const completeUrl = getCompleteUrl(newRequest.url, "templates");
-  let guestPage = loadFile(completeUrl);
+  let guestPage = loadFile(completeUrl, "utf8");
   let comments = loadOlderComments(COMMENTS_FILE);
   let commentsList = comments.map(readCommentList);
   guestPage = guestPage.replace("__COMMENTS__", commentsList.join("\n"));
@@ -89,6 +88,9 @@ const main = function(port) {
   server.on("request", (req, res) => {
     if (req.method === "GET" && req.url == "/guestBook.html") {
       return serveGuestPage(req, res);
+    }
+    if (req.method === "POST") {
+      return saveComments(req, res);
     }
     return loadResponseText(req, res);
   });
