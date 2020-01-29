@@ -1,7 +1,10 @@
+// eslint-disable-next-line no-unused-vars
 const hideJar = function() {
-  const jar = document.getElementById("waterJar");
-  jar.style.visibility = "hidden";
+  // eslint-disable-next-line no-undef
+  const jar = document.getElementById('waterJar');
+  jar.style.visibility = 'hidden';
+  const timeOut = 1000;
   setTimeout(() => {
-    jar.removeAttribute("style");
-  }, 1 * 1000);
+    jar.removeAttribute('style');
+  }, timeOut);
 };

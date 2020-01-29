@@ -1,15 +1,14 @@
-const { parse } = require("url");
-const fs = require("fs");
+const { parse } = require('url');
+const fs = require('fs');
 class Comment {
   constructor(path) {
     this.commentsFile = path;
     this.commentLogs = [];
     this.commentDetails = {};
-    this.commentLine = "";
+    this.commentLine = '';
   }
   set commentLog(chunk) {
-    this.commentLine = this.commentLine + chunk;
-    return;
+    this.commentLine = this.commentLine + chunk;  
   }
   set commentsData(data) {
     this.commentLogs = [...data];
