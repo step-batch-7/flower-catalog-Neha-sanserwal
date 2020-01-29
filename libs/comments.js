@@ -1,26 +1,19 @@
-const { parse } = require('url');
-const fs = require('fs');
 class Comment {
-  constructor(path) {
-    this.commentsFile = path;
-    this.commentLogs = [];
-    this.commentDetails = {};
-    this.commentLine = '';
+  constructor(logs, newEntry) {
+    this.commentLogs = logs;
+    this.newEntry = newEntry;
   }
-  set commentLog(chunk) {
-    this.commentLine = this.commentLine + chunk;  
+
+  static parseNewEntry(parser, text, nowDate) {
+    const newEntry = { ...parser(`?${text}`, true).query };
+    newEntry.time = nowDate().toLocaleTimeString();
+    newEntry.date = nowDate().toLocaleDateString();
+    return newEntry;
   }
-  set commentsData(data) {
-    this.commentLogs = [...data];
-  }
-  append() {
-    this.commentLogs.unshift(this.commentDetails);
-    fs.writeFileSync(this.commentsFile, JSON.stringify(this.commentLogs));
-  }
-  parseCommentDetails() {
-    this.commentDetails = parse(`?${this.commentLine}`, true).query;
-    this.commentDetails.date = new Date().toLocaleDateString();
-    this.commentDetails.time = new Date().toLocaleTimeString();
+
+  append(file, writer) {
+    this.commentLogs.unshift(this.newEntry);
+    writer(file, this.commentLogs);
   }
 }
 module.exports = {
