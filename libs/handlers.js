@@ -1,13 +1,13 @@
 const fs = require('fs');
 const { parse } = require('url');
 const { App } = require('./app.js');
-const { Comment } = require('./libs/comments');
+const { Comment } = require('./comments');
 
-const STATIC_DIR = `${__dirname}/public`;
+const STATIC_DIR = `${__dirname}/../public`;
 const COMMENTS_FILE = `${STATIC_DIR}/docs/comments.json`;
 
 const getFileExtension = function(fileName) {
-  const [, fileExt] = fileName.split('.');
+  const fileExt = fileName.split('.').pop();
   return fileExt;
 };
 const loadFile = function(filePath, encoding) {
@@ -71,13 +71,13 @@ const generateGetResponse = function(url, res, body) {
 };
 
 const loadResponseText = function(req, res) {
-  const completeUrl = getCompleteUrl(req.url, 'public');
+  const completeUrl = getCompleteUrl(req.url);
   const body = loadFile(completeUrl);
   generateGetResponse(completeUrl, res, body);
 };
 
 const notFound = function(req, res) {
-  const completeUrl = getCompleteUrl(req.url, 'public');
+  const completeUrl = getCompleteUrl(req.url);
   if (!fs.existsSync(completeUrl)) {
     res.writeHead('404', 'NOT FOUND');
     res.end();
