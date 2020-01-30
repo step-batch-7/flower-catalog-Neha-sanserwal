@@ -55,4 +55,6 @@
 
 --Done-- * Extract loadFile  and write to function.
 
---Done-- * move file to respective folder
+--Done-- * move file to respective folder.
+
+--Done-- * extracted class app and file handlers.
