@@ -6,8 +6,8 @@ class Comment {
 
   static parseNewEntry(parser, text, nowDate) {
     const newEntry = { ...parser(`?${text}`, true).query };
-    newEntry.time = nowDate().toLocaleTimeString();
-    newEntry.date = nowDate().toLocaleDateString();
+    newEntry.time = nowDate.toLocaleTimeString();
+    newEntry.date = nowDate.toLocaleDateString();
     return newEntry;
   }
 
