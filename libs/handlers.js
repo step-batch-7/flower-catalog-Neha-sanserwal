@@ -21,6 +21,11 @@ const writeTo = function(filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data));
 };
 
+const isFileNotAvailable = function(filePath) {
+  const stats = fs.existsSync(filePath) && fs.statSync(filePath);
+  return !stats || !stats.isFile();
+};
+
 const loadOlderComments = function(commentsFile) {
   if (!fs.existsSync(commentsFile)) {
     writeTo(commentsFile, []);
@@ -70,8 +75,12 @@ const generateGetResponse = function(url, res, body) {
   res.end();
 };
 
-const loadResponseText = function(req, res) {
+const loadResponseText = function(req, res, next) {
   const completeUrl = getCompleteUrl(req.url);
+  if (isFileNotAvailable(completeUrl)) {
+    next();
+    return;
+  }
   const body = loadFile(completeUrl);
   generateGetResponse(completeUrl, res, body);
 };
@@ -95,8 +104,9 @@ const app = new App();
 
 app.use(readBody);
 app.get('/guestBook.html', serveGuestPage);
-app.get('', loadResponseText);
+app.get('/', loadResponseText);
 app.post('/guestBook.html', saveComment);
-app.use(notFound);
+app.get('', notFound);
+app.post('', notFound);
 
 module.exports = { app };

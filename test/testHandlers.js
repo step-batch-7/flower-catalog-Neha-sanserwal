@@ -27,4 +27,15 @@ describe('GET request', function() {
       .expect('Content-type', 'text/jpg')
       .expect(200, done);
   });
+  it('should load js files when browser ask for it', function(done) {
+    request(app.serve.bind(app))
+      .get('/js/animateJar.js')
+      .expect('Content-type', 'text/js')
+      .expect(200, done);
+  });
+  it('should give error of not found when the file is not present', function(done) {
+    request(app.serve.bind(app))
+      .get('/abc.s')
+      .expect(404, done);
+  });
 });
