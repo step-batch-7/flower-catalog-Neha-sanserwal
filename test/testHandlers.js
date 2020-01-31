@@ -33,11 +33,23 @@ describe('GET request', function() {
       .expect('Content-type', 'text/js')
       .expect(200, done);
   });
+  it('should return guest with comments when the route is /guestBook.html', function(done) {
+    request(app.serve.bind(app))
+      .get('/guestBook.html')
+      .expect('Content-type', 'text/html')
+      .expect(200, done);
+  });
+});
+
+describe('not found ', function() {
   it('should give error of not found when the file is not present', function(done) {
     request(app.serve.bind(app))
       .get('/abc.s')
       .expect(404, done);
   });
+});
+
+describe('Bad request', function() {
   it('should not allow methods on page which are not allowed', function(done) {
     request(app.serve.bind(app))
       .put('/')
