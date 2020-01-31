@@ -1,6 +1,7 @@
 const request = require('supertest');
-
 const { app } = require('../libs/handlers');
+const fs = require('fs');
+const sinon = require('sinon');
 
 describe('GET request', function() {
   it('should return index.html when the route is /', function(done) {
@@ -55,5 +56,20 @@ describe('Bad request', function() {
       .put('/')
       .send({ name: 'john' })
       .expect(400, done);
+  });
+});
+
+describe('POST request', function() {
+  it('should not allow methods on page which are not allowed', function(done) {
+    sinon.replace(fs, 'readFileSync', () => {
+      return '[]';
+    });
+    request(app.serve.bind(app))
+      .post('/guestBook.html')
+      .send({ username: 'john', comment: 'hello' })
+      .expect(302, done);
+  });
+  after(() => {
+    sinon.restore();
   });
 });
