@@ -38,4 +38,10 @@ describe('GET request', function() {
       .get('/abc.s')
       .expect(404, done);
   });
+  it('should not allow methods on page which are not allowed', function(done) {
+    request(app.serve.bind(app))
+      .put('/')
+      .send({ name: 'john' })
+      .expect(400, done);
+  });
 });

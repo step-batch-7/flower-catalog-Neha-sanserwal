@@ -86,11 +86,12 @@ const loadResponseText = function(req, res, next) {
 };
 
 const notFound = function(req, res) {
-  const completeUrl = getCompleteUrl(req.url);
-  if (!fs.existsSync(completeUrl)) {
-    res.writeHead('404', 'NOT FOUND');
-    res.end();
-  }
+  res.writeHead('404', 'NOT FOUND');
+  res.end();
+};
+const methodNotAllowed = function(req, res) {
+  res.writeHead('400', 'Method Not Allowed');
+  res.end();
 };
 const serveGuestPage = function(req, res) {
   const completeUrl = getCompleteUrl(req.url, 'templates');
@@ -107,6 +108,6 @@ app.get('/guestBook.html', serveGuestPage);
 app.get('/', loadResponseText);
 app.post('/guestBook.html', saveComment);
 app.get('', notFound);
-app.post('', notFound);
+app.use(methodNotAllowed);
 
 module.exports = { app };
