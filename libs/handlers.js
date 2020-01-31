@@ -4,7 +4,7 @@ const { App } = require('./app.js');
 const { Comment } = require('./comments');
 
 const STATIC_DIR = `${__dirname}/../public`;
-const COMMENTS_FILE = `${STATIC_DIR}/comments.json`;
+const COMMENTS_FILE = 'comments.json';
 
 const getFileExtension = function(fileName) {
   const fileExt = fileName.split('.').pop();
