@@ -4,6 +4,14 @@ const fs = require('fs');
 const sinon = require('sinon');
 
 describe('GET request', function() {
+  before(() => {
+    sinon.replace(fs, 'existsSync', () => {
+      return true;
+    });
+    sinon.replace(fs, 'readFileSync', () => {
+      return '[]';
+    });
+  });
   it('should return index.html when the route is /', function(done) {
     request(app.serve.bind(app))
       .get('/')
@@ -40,6 +48,9 @@ describe('GET request', function() {
       .expect('Content-type', 'text/html')
       .expect(200, done);
   });
+  after(() => {
+    sinon.restore();
+  });
 });
 
 describe('not found ', function() {
@@ -60,10 +71,16 @@ describe('Bad request', function() {
 });
 
 describe('POST request', function() {
-  it('should not allow methods on page which are not allowed', function(done) {
+  before(() => {
+    sinon.replace(fs, 'existsSync', () => {
+      return true;
+    });
     sinon.replace(fs, 'readFileSync', () => {
       return '[]';
     });
+    sinon.replace(fs, 'writeFileSync', () => {});
+  });
+  it('should post the comment', function(done) {
     request(app.serve.bind(app))
       .post('/guestBook.html')
       .send({ username: 'john', comment: 'hello' })
